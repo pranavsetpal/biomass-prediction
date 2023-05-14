@@ -5,13 +5,12 @@ from src.features.build_features import load_dataset
 torch.manual_seed(0)
 
 model = ViT(15, 5, 4, n_enc_blocks=2)
-train_images, train_agbd = load_dataset('train')
-val_images, val_agbd = load_dataset('val')
+train_features, train_target = load_dataset('train')
+val_features, val_target = load_dataset('val')
 
-model.fit(train_images, train_agbd,
-          val_images, val_agbd,
+model.fit(train_features, train_target,
+          val_features, val_target,
           epochs=30,
           batch_size=1138,
           lr=1e-2
 )
-
