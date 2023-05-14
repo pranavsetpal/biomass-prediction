@@ -95,7 +95,7 @@ class ViT(nn.Module):
 
 
     def eval(self, inputs, targets):
-        loss = self.MSE(self(inputs), targets).sum().item()
+        loss = self.MSE(self(inputs), targets).sum().item() / len(inputs)
 
         print("Eval:")
         print(f"MSE  = {loss:.4f}")
