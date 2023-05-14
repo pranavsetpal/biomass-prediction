@@ -91,7 +91,7 @@ class ViT(nn.Module):
                 print("---------------------")
                 break
 
-            val_loss = self.MSE(val_X, val_Y).sum().item() / len(val_X)
+            val_loss = self.MSE(self(val_X), val_Y).sum().item() / len(val_X)
 
             print(f"Epoch {epoch+1}/{epochs}:")
             print(f"  Train: MSE={total_loss:.4f} RSME={total_loss**(1/2):.4f}")
