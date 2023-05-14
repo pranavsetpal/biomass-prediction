@@ -63,19 +63,19 @@ class ViT(nn.Module):
         return output
 
 
-    def fit(self, inputs, targets, epochs, batch_size, lr=1e-2):
+    def fit(self, train_X, train_Y, val_X, val_Y, epochs, batch_size, lr=1e-2):
         optimizer = torch.optim.Adam(self.parameters(), lr=lr)
 
-        n_samples = len(inputs)
-        inputs  = [ inputs[i:i+batch_size] for i in range(0,len(inputs) ,batch_size)]
-        targets = [targets[i:i+batch_size] for i in range(0,len(targets),batch_size)]
+        n_samples = len(train_X)
+        train_X  = [ train_X[i:i+batch_size] for i in range(0,len(train_X) ,batch_size)]
+        train_Y = [train_Y[i:i+batch_size] for i in range(0,len(train_Y),batch_size)]
 
         for epoch in range(epochs):
             total_loss = 0
 
-            for input,target in zip(inputs,targets):
+            for x,y in zip(train_X,train_Y):
                 optimizer.zero_grad()
-                loss = self.MSE(self(input), target)
+                loss = self.MSE(self(x), y)
                 total_loss += loss.sum().item()
 
                 loss.backward(torch.ones(batch_size).unsqueeze(1))
@@ -91,15 +91,11 @@ class ViT(nn.Module):
                 print("---------------------")
                 break
 
-            print(f"Epoch {epoch+1}/{epochs}: \tMSE  = {total_loss:.4f} \tRSME = {total_loss**(1/2):.4f}")
+            val_loss = self.MSE(val_X, val_Y).sum().item() / len(val_X)
 
-
-    def eval(self, inputs, targets):
-        loss = self.MSE(self(inputs), targets).sum().item() / len(inputs)
-
-        print("Eval:")
-        print(f"MSE  = {loss:.4f}")
-        print(f"RMSE = {loss**(1/2):.4f}")
+            print(f"Epoch {epoch+1}/{epochs}:")
+            print(f"  Train: MSE={total_loss:.4f} RSME={total_loss**(1/2):.4f}")
+            print(f"  Val  : MSE={val_loss  :.4f} RSME={val_loss**(1/2)  :.4f}")
 
 
     def patched(self, images, patch_size):

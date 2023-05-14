@@ -1,8 +1,8 @@
 import h5py
 import torch
 
-def load_dataset(type):
-    dataset = h5py.File(f"./data/{type}.h5", 'r')
+def load_dataset(data):
+    dataset = h5py.File(f"./data/{data}.h5", 'r')
 
     images = dataset['images'][:,:,:,[0,1,7,10]]
     # Vegetation Index
