@@ -9,11 +9,11 @@ class Encoder(nn.Module):
         self.layer_norm = nn.LayerNorm((n_patches, n_features), elementwise_affine=False, dtype=dtype)
         self.msa = nn.MultiheadAttention(n_features, n_heads, batch_first=True, dtype=dtype)
         self.mlp = nn.Sequential(
+            nn.Dropout(),
             nn.Linear(n_features, n_features, dtype=dtype),
             nn.GELU(),
             nn.Dropout(),
-            nn.Linear(n_features, n_features, dtype=dtype),
-            nn.Dropout()
+            nn.Linear(n_features, n_features, dtype=dtype)
         )
 
 

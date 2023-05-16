@@ -12,7 +12,6 @@ def load_dataset(data):
         dataset['images'][:,:,:,[1,7,10]] / 10000,
         veg_index
     ], 3)
-
     features = torch.from_numpy(features)
 
     target = torch.tensor(dataset['agbd'][:], dtype=torch.float64).unsqueeze(1)
