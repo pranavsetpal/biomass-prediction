@@ -8,7 +8,7 @@ train_data, train_target = load_dataset('train')
 val_data, val_target = load_dataset('val')
 
 _, _, image_size, n_features = train_data.shape
-patch_size = 3
+patch_size = 5
 
 model = ViT(image_size, patch_size, n_features, n_enc_blocks=2)
 model.fit(train_data, train_target,
