@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
+from torch.utils.data import DataLoader
 
 class Encoder(nn.Module):
     def __init__(self, n_patches, n_features, n_heads, dtype=torch.float64):
@@ -63,38 +64,39 @@ class ViT(nn.Module):
         return output
 
 
-    def fit(self, train_X, train_Y, val_X, val_Y, epochs, batch_size, lr=1e-2):
+    def fit(self, train_dataset, val_dataset, epochs, batch_size, lr=1e-2):
         optimizer = torch.optim.Adam(self.parameters(), lr=lr)
 
-        n_samples = len(train_X)
-        train_X  = [ train_X[i:i+batch_size] for i in range(0,len(train_X) ,batch_size)]
-        train_Y = [train_Y[i:i+batch_size] for i in range(0,len(train_Y),batch_size)]
-
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
         for epoch in range(epochs):
-            total_loss = 0
 
-            for x,y in zip(train_X,train_Y):
+            train_loss = 0
+            for X,Y in train_dataloader:
                 optimizer.zero_grad()
-                loss = self.MSE(self(x), y)
-                total_loss += loss.sum().item()
+                loss = self.MSE(self(X), Y)
+                train_loss += loss.sum().item()
 
                 loss.backward(torch.ones(batch_size).unsqueeze(1))
                 optimizer.step()
+            train_loss /= len(train_dataset)
 
-            total_loss /= n_samples
+            val_loss = 0
+            for X,Y in val_dataloader:
+                loss = self.MSE(self(X), Y)
+                val_loss += loss.sum().item()
+            val_loss /= len(val_dataset)
 
-            if (total_loss < 100):
+            if (val_loss < 20):
                 print("---------------------")
                 print("Num of epoches:", epoch)
-                print("\tMSE  = ", total_loss)
-                print("\tRMSE = ", total_loss**(1/2))
+                print("\tMSE  = ", val_loss)
+                print("\tRMSE = ", val_loss**(1/2))
                 print("---------------------")
                 break
 
-            val_loss = self.MSE(self(val_X), val_Y).sum().item() / len(val_X)
-
             print(f"Epoch {epoch+1}/{epochs}:")
-            print(f"  Train: MSE={total_loss:.4f} RSME={total_loss**(1/2):.4f}")
+            print(f"  Train: MSE={train_loss:.4f} RSME={train_loss**(1/2):.4f}")
             print(f"  Val  : MSE={val_loss  :.4f} RSME={val_loss**(1/2)  :.4f}")
 
 
