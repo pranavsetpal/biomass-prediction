@@ -27,6 +27,7 @@ class Encoder(nn.Module):
 
         return output
 
+
 class ViT(nn.Module):
     def __init__(self, image_size, patch_size, n_channels, n_enc_blocks=1, dtype=torch.float64):
         super().__init__()
@@ -36,7 +37,7 @@ class ViT(nn.Module):
 
         self.patch_size = patch_size
 
-        self.learnable_emb = nn.Parameter(torch.zeros(1, n_features))
+        self.class_token = nn.Parameter(torch.zeros(1, n_features))
         self.pos = nn.Parameter(self.pos_emb(n_patches+1, n_features))
 
         self.encoder = nn.ModuleList([
@@ -46,13 +47,16 @@ class ViT(nn.Module):
 
         self.linear = nn.Linear(n_features, 1, dtype=dtype)
 
-        self.MSE = nn.MSELoss(reduction='none')
+        self.MSE = nn.MSELoss(reduction='sum')
 
 
     def forward(self, input):
         patches = self.patched(input, self.patch_size)
 
-        patches = torch.cat([self.learnable_emb.unsqueeze(0).repeat(len(patches),1,1), patches], 1)
+        patches = torch.cat([
+            self.class_token.unsqueeze(0).repeat(len(patches),1,1),
+            patches
+        ], 1)
         enc_input = patches + self.pos
 
         for enc_block in self.encoder:
@@ -64,6 +68,10 @@ class ViT(nn.Module):
         return output
 
 
+    def loss(self, inputs, targets):
+        preds = self(inputs)
+        return self.MSE(preds, targets)
+
     def fit(self, train_dataset, val_dataset, epochs, batch_size, lr=1e-2):
         optimizer = torch.optim.Adam(self.parameters(), lr=lr)
 
@@ -74,17 +82,16 @@ class ViT(nn.Module):
             train_loss = 0
             for X,Y in train_dataloader:
                 optimizer.zero_grad()
-                loss = self.MSE(self(X), Y)
-                train_loss += loss.sum().item()
+                loss = self.loss(X, Y)
+                train_loss += loss.item()
 
-                loss.backward(torch.ones(batch_size).unsqueeze(1))
+                loss.backward()
                 optimizer.step()
             train_loss /= len(train_dataset)
 
             val_loss = 0
             for X,Y in val_dataloader:
-                loss = self.MSE(self(X), Y)
-                val_loss += loss.sum().item()
+                val_loss += self.loss(X, Y).item()
             val_loss /= len(val_dataset)
 
             if (val_loss < 20):

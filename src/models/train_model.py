@@ -14,6 +14,6 @@ model = ViT(image_size, patch_size, n_features, n_enc_blocks=2)
 model.fit(train_dataset,
           val_dataset,
           epochs=2,
-          batch_size=2276,
-          lr=0.01
+          batch_size=4552,
+          lr=0.001
 )
