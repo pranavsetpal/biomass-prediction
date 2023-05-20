@@ -135,3 +135,41 @@ class ViT(nn.Module):
                 pe[pos,i] = np.cos(pos / 10000**(i/d_patch))
 
         return pe
+
+
+class DeiT(ViT):
+    def __init__(self, teacher_model, image_size, patch_size, n_channels, n_enc_blocks=1, dtype=torch.float64):
+        super().__init__(image_size, patch_size, n_channels, n_enc_blocks, dtype)
+
+        self.distillation_token = nn.Parameter(torch.zeros(1, n_features))
+        self.pos = nn.Parameter(self.pos_emb(n_patches+2, n_features))
+        self.linear = nn.Linear(n_features, 2, dtype=dtype)
+
+        self.teacher_model = teacher_model
+
+
+    def forward(self, input):
+        patches = self.patched(input, self.patch_size)
+
+        patches = torch.cat([
+            self.class_token.unsqueeze(0).repeat(len(patches),1,1),
+            self.distillation_token.unsqueeze(0).repeat(len(patches),1,1),
+            patches
+        ], 1)
+        enc_input = patches + self.pos
+
+        for enc_block in self.encoder:
+            enc_input = enc_block(enc_input)
+
+        linear_input = enc_input[:,[0,1]]
+        output = self.linear(linear_input)
+
+        return output
+
+
+    def loss(self, inputs, class_targets):
+        class_preds, teacher_preds = self(inputs)
+        teacher_targets = self.teacher_model(inputs)
+        return (self.MSE(class_preds  , class_targets) +
+                self.MSE(teacher_preds, teacher_targets))
+
