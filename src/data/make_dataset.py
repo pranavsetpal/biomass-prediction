@@ -9,7 +9,7 @@ from src.features.build_features import build_features
 
 class ABCDataset(Dataset):
     def __init__(self, data_type, device):
-        dataset = h5py.File(f"./data/processed/{data_type}.h5")
+        dataset = h5py.File(f"./data/processed/{data_type}.h5", 'r')
 
         self.features = torch.from_numpy(dataset["features"][:]).to(device)
         self.targets = torch.from_numpy(dataset["targets"][:]).to(device)
