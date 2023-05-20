@@ -49,9 +49,9 @@ def make_dataset():
 
     for data_type in data_types:
         # Source dataset from link
-        # with path_safe(open, f"./data/raw/{data_type}.h5", "wb") as f:
-        #     data = requests.get(f"https://share.phys.ethz.ch/~pf/albecker/abc/09072022_1154_{data_type}.h5").content
-        #     f.write(data)
+        with path_safe(open, f"./data/raw/{data_type}.h5", "wb") as f:
+            data = requests.get(f"https://share.phys.ethz.ch/~pf/albecker/abc/09072022_1154_{data_type}.h5").content
+            f.write(data)
 
         # Build features and augment data
         dataset = h5py.File(f"./data/raw/{data_type}.h5", 'r')
