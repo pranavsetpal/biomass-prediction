@@ -52,35 +52,10 @@ class Lasso(nn.Module):
       val_loss /= len(val_dataset)
 
       if (val_loss < 20):
-        print("---------------------")
-        print("Num of epoches:", epoch)
-        print("\tMSE  = ", val_loss)
-        print("\tRMSE = ", val_loss**(1/2))
-        print("---------------------")
         break
 
-      print(f"Epoch {epoch+1}/{epochs}:")
-      print(f"  Train: MSE={train_loss:.4f} RSME={train_loss**(1/2):.4f}")
-      print(f"  Val  : MSE={val_loss  :.4f} RSME={val_loss**(1/2)  :.4f}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      print("---------------------")
+      print("Num of epoches:", epoch)
+      print("\tMSE  = ", val_loss)
+      print("\tRMSE = ", val_loss**(1/2))
+      print("---------------------")
