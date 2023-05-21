@@ -55,7 +55,7 @@ class Lasso(nn.Module):
         break
 
     print("---------------------")
-    print("Num of epoches:", epoch)
+    print("Num of epoches:", epoch+1)
     print("\tMSE  = ", val_loss)
     print("\tRMSE = ", val_loss**(1/2))
     print("---------------------")

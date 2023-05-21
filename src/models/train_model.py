@@ -27,7 +27,7 @@ for n_enc_blocks in params["n_enc_blocks"]:
       model = ViT(image_size, patch_size, n_features, n_enc_blocks=n_enc_blocks).to(device)
       loss = model.fit(train_dataset,
         val_dataset,
-        epochs=2,
+        epochs=50,
         batch_size=batch_size,
         lr=lr
       )
