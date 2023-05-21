@@ -14,8 +14,8 @@ patch_size = 5
 
 params = {
   "n_enc_blocks": [1,2,3,4],
-  "batch_size": [1138, 9104, 25036, 75108],
-  "lr": [0.01, 0.005, 0.001]
+  "batch_size": [1138, 9104, 25036],
+  "lr": [0.005, 0.001]
 }
 
 best_model = None
@@ -27,7 +27,7 @@ for n_enc_blocks in params["n_enc_blocks"]:
       model = ViT(image_size, patch_size, n_features, n_enc_blocks=n_enc_blocks).to(device)
       loss = model.fit(train_dataset,
         val_dataset,
-        epochs=50,
+        epochs=30,
         batch_size=batch_size,
         lr=lr
       )
