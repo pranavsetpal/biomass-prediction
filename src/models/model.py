@@ -104,6 +104,17 @@ class ViT(nn.Module):
         return val_loss
 
 
+    def evaluate(self, dataset):
+        dataloader = DataLoader(dataset)
+        loss = 0
+        for X,Y in dataloader:
+            loss += self.loss(X,Y)
+        loss /= len(dataset)
+
+        return loss
+
+
+
     def patched(self, images, patch_size):
         # Input:  (n_samples, h_image, w_image, n_channels), (h_patch, w_patch)
         # Output: (n_samples, n_patches, n_channels*h_patch*w_patch)
