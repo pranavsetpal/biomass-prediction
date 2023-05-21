@@ -54,8 +54,8 @@ class Lasso(nn.Module):
       if (val_loss < 20):
         break
 
-      print("---------------------")
-      print("Num of epoches:", epoch)
-      print("\tMSE  = ", val_loss)
-      print("\tRMSE = ", val_loss**(1/2))
-      print("---------------------")
+    print("---------------------")
+    print("Num of epoches:", epoch)
+    print("\tMSE  = ", val_loss)
+    print("\tRMSE = ", val_loss**(1/2))
+    print("---------------------")
