@@ -24,9 +24,9 @@ class ABCDataset(Dataset):
         return feature, target
 
 
-def path_safe(func, path, *args):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    return func(path, *args)
+def path_safe(func, path_idx, args):
+    os.makedirs(os.path.dirname(args[path_idx]), exist_ok=True)
+    return func(*args)
 
 def augment_data(data):
     return np.concatenate([
@@ -49,7 +49,7 @@ def make_dataset():
 
     for data_type in data_types:
         # Source dataset from link
-        with path_safe(open, f"./data/raw/{data_type}.h5", "wb") as f:
+        with path_safe(open, 0, [f"./data/raw/{data_type}.h5", "wb"]) as f:
             data = requests.get(f"https://share.phys.ethz.ch/~pf/albecker/abc/09072022_1154_{data_type}.h5").content
             f.write(data)
 
@@ -62,7 +62,7 @@ def make_dataset():
             targets = np.tile(targets, 12) # Tile to expand targets along with features
 
         # Save processed dataset
-        with path_safe(h5py.File, f"./data/processed/{data_type}.h5", 'w') as f:
+        with path_safe(h5py.File, 0, [f"./data/processed/{data_type}.h5", 'w']) as f:
             f.create_dataset("features", data=features)
             f.create_dataset("targets", data=targets)
 
