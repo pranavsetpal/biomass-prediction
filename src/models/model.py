@@ -101,6 +101,7 @@ class ViT(nn.Module):
         print("\tMSE  = ", val_loss)
         print("\tRMSE = ", val_loss**(1/2))
         print("---------------------")
+        return val_loss
 
 
     def patched(self, images, patch_size):

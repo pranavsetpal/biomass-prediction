@@ -59,3 +59,4 @@ class Lasso(nn.Module):
     print("\tMSE  = ", val_loss)
     print("\tRMSE = ", val_loss**(1/2))
     print("---------------------")
+    return val_loss
